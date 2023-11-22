@@ -82,9 +82,12 @@ public class TeacherHttpController {
                 throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Teacher Not found");
             }
 
+
+            connection.prepareStatement("DELETE FROM ");
             PreparedStatement stm = connection.prepareStatement("DELETE FROM teacher WHERE id =?");
             stm.setInt(1,id);
             stm.executeUpdate();
+
 
         } catch (SQLException e) {
             throw new RuntimeException(e);
