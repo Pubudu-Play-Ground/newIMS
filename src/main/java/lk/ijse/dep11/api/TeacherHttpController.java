@@ -4,6 +4,7 @@ import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import lk.ijse.dep11.to.TeacherTO;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -30,9 +31,9 @@ public class TeacherHttpController {
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping(produces = "application/json", consumes = "application/json")
-    public TeacherTO addTeacher(@RequestBody TeacherTO teacherTO){
+    public TeacherTO addTeacher(@RequestBody @Validated TeacherTO teacherTO){
         try(Connection connection=pool.getConnection()){
-            PreparedStatement stm = connection.prepareStatement("INSERT INTO teacher (id,name,contact) VALUES (?,?)", Statement.RETURN_GENERATED_KEYS);
+            PreparedStatement stm = connection.prepareStatement("INSERT INTO teacher (name,contact) VALUES (?,?)", Statement.RETURN_GENERATED_KEYS);
             stm.setString(1,teacherTO.getName());
             stm.setString(2, teacherTO.getContact());
             stm.executeUpdate();
@@ -51,7 +52,7 @@ public class TeacherHttpController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PatchMapping(value = "/{id}",consumes = "application/json")
     public void updateTeacher(@PathVariable int id,
-                              @RequestBody TeacherTO teacherTO){
+                              @RequestBody @Validated TeacherTO teacherTO){
         try(Connection connection= pool.getConnection()) {
             PreparedStatement existSTM = connection.prepareStatement("SELECT * FROM teacher WHERE id=?");
             existSTM.setInt(1,id);
@@ -59,7 +60,7 @@ public class TeacherHttpController {
             if(!existSTM.executeQuery().next()){
                 throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Teacher Not found");
             }
-            PreparedStatement stm = connection.prepareStatement("UPDATE teacher SET name=? contact=? WHERE id=?");
+            PreparedStatement stm = connection.prepareStatement("UPDATE teacher SET name=?, contact=? WHERE id=?");
             stm.setString(1,teacherTO.getName());
             stm.setString(2, teacherTO.getContact());
             stm.setInt(3,id);
@@ -92,10 +93,12 @@ public class TeacherHttpController {
     }
 
     @GetMapping(value = "/{id}",produces = "application/json")
-    public TeacherTO getTeacher(){
+    public TeacherTO getTeacher(@PathVariable("id") int teacherID){
         try(Connection connection= pool.getConnection()) {
-            Statement stm = connection.createStatement();
-            ResultSet rst = stm.executeQuery("SELECT * FROM teacher WHERE id = ?");
+            PreparedStatement stm = connection.prepareStatement("SELECT * FROM teacher WHERE id = ?");
+            stm.setInt(1,teacherID);
+
+            ResultSet rst = stm.executeQuery();
 
             if(!rst.next()){
                 throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Teacher do not exists");
