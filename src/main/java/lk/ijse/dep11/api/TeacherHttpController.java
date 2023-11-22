@@ -80,7 +80,14 @@ public class TeacherHttpController {
                 throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Teacher Not found");
             }
 
+<<<<<<< HEAD
             connection.prepareStatement("DELETE FROM ");
+=======
+            PreparedStatement stm = connection.prepareStatement("DELETE FROM teacher WHERE id =?");
+            stm.setInt(1,id);
+            stm.executeUpdate();
+
+>>>>>>> a77609ea8d486f05b9be45f01062701cc2a396af
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -88,7 +95,13 @@ public class TeacherHttpController {
 
     @GetMapping(value = "/{id}",produces = "application/json")
     public TeacherTO getTeacher(){
-        System.out.println("get");
+        try(Connection connection= pool.getConnection()) {
+            Statement stm = connection.createStatement();
+            ResultSet rst = stm.executeQuery("SELECT * FROM teacher WHERE id = ?");
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
         return null;
     }
 
