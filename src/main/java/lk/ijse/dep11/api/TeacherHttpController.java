@@ -55,7 +55,7 @@ public class TeacherHttpController {
             existSTM.setInt(1,id);
 
             if(!existSTM.executeQuery().next()){
-                throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Teacher Not found")
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Teacher Not found");
             }
             PreparedStatement stm = connection.prepareStatement("UPDATE teacher SET name=? contact=? WHERE id=?");
             stm.setString(1,teacherTO.getName());
@@ -77,10 +77,10 @@ public class TeacherHttpController {
             existSTM.setInt(1,id);
 
             if(!existSTM.executeQuery().next()){
-                throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Teacher Not found")
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Teacher Not found");
             }
 
-            connection.prepareStatement("DELETE FROM ")
+            connection.prepareStatement("DELETE FROM ");
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
