@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @RestController
 @RequestMapping("/teachers")
@@ -55,7 +57,7 @@ public class TeacherHttpController {
             existSTM.setInt(1,id);
 
             if(!existSTM.executeQuery().next()){
-                throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Teacher Not found")
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Teacher Not found");
             }
             PreparedStatement stm = connection.prepareStatement("UPDATE teacher SET name=? contact=? WHERE id=?");
             stm.setString(1,teacherTO.getName());
@@ -77,7 +79,7 @@ public class TeacherHttpController {
             existSTM.setInt(1,id);
 
             if(!existSTM.executeQuery().next()){
-                throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Teacher Not found")
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Teacher Not found");
             }
 
             PreparedStatement stm = connection.prepareStatement("DELETE FROM teacher WHERE id =?");
@@ -95,15 +97,31 @@ public class TeacherHttpController {
             Statement stm = connection.createStatement();
             ResultSet rst = stm.executeQuery("SELECT * FROM teacher WHERE id = ?");
 
+            if(!rst.next()){
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Teacher do not exists");
+            }
+            return new TeacherTO(rst.getInt("id"), rst.getString("name"), rst.getString("contact") );
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-        return null;
     }
 
     @GetMapping(produces = "application/json")
-    public TeacherTO getALlTeacher(){
-        System.out.println("getAll");
-        return null;
+    public List<TeacherTO> getALlTeacher(){
+        try(Connection connection= pool.getConnection()) {
+            Statement stm = connection.createStatement();
+            ResultSet rst = stm.executeQuery("SELECT * FROM teacher");
+
+            List<TeacherTO>teacherList=new ArrayList<>();
+            while (rst.next()){
+                int id = rst.getInt("id");
+                String name = rst.getString("name");
+                String contact = rst.getString("contact");
+                teacherList.add(new TeacherTO(id,name,contact));
+            }
+            return teacherList;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
