@@ -9,8 +9,8 @@ import java.io.Serializable;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class TeacherTO implements Serializable {
+public class CourseTO implements Serializable {
     private Integer id;
     private String name;
-    private String contact;
+    private Integer durationInMonths;
 }
